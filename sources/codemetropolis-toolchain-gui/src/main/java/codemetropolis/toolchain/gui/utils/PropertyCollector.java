@@ -13,6 +13,8 @@ import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -121,6 +123,13 @@ public class PropertyCollector {
 				//When we found the 'properties' tag, we collect the list of properties contained by it.
 				if(child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equals("properties")) {
 					propertyList = getPropertyList((Element)child);
+					//Sorting properties/metrics in an alphabetical order...
+					Collections.sort(propertyList, new Comparator<Property>() {
+					    @Override
+					    public int compare(Property p1, Property p2) {
+					        return (p1.name).compareToIgnoreCase(p2.name);
+					    }
+					});
 					propertyMap.put(element.getAttribute("type"), propertyList);
 					break;
 				}
@@ -144,7 +153,10 @@ public class PropertyCollector {
 				Property p = new Property();
 				p.name = property.getAttribute("name");
 				p.type = property.getAttribute("type");
-				result.add(p);
+				//Filtering out properties with string type...
+				if(!p.type.equals("string")) {
+					result.add(p);
+				}					
 			}
 		}
 		return result;

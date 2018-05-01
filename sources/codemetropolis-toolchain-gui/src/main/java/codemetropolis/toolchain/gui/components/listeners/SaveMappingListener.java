@@ -2,12 +2,16 @@ package codemetropolis.toolchain.gui.components.listeners;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 
 import codemetropolis.toolchain.gui.components.CMTable;
+import codemetropolis.toolchain.gui.components.CMTextField;
+import codemetropolis.toolchain.gui.utils.Translations;
 import codemetropolis.toolchain.mapping.conversions.Conversion;
 import codemetropolis.toolchain.mapping.exceptions.MappingWriterException;
 import codemetropolis.toolchain.mapping.model.Binding;
@@ -16,9 +20,14 @@ import codemetropolis.toolchain.mapping.model.Linking;
 import codemetropolis.toolchain.mapping.model.Mapping;
 import codemetropolis.toolchain.mapping.model.Parameter;
 
+/**
+ * Listener class for handling save actions.
+ * @author Viktor Meszaros {@literal <MEVXAAT.SZE>}
+ *
+ */
 public class SaveMappingListener implements ActionListener {
 	
-	//private String savePath;	
+	private CMTextField saveField;
 	private List<CMTable> tables;
 	private JList<String> resources;
 	
@@ -33,9 +42,8 @@ public class SaveMappingListener implements ActionListener {
 	 * @param tables The list of tables which contain every necessary information to create linkings, bindings and conversions.
 	 * @param resources The list of resources defined by the user.
 	 */
-	public SaveMappingListener(String savePath, List<CMTable> tables, JList<String> resources) {
-		//this.savePath = savePath;
-		//savePath.replace("\\", "/"); Didn't work...
+	public SaveMappingListener(CMTextField saveField, List<CMTable> tables, JList<String> resources) {
+		this.saveField = saveField;
 		this.tables = tables;
 		this.resources = resources;
 	}
@@ -49,8 +57,15 @@ public class SaveMappingListener implements ActionListener {
 		addLinkings(mapping);
 		
 		try {
-			//!!!!
-			mapping.writeToXML("C:\\Users\\Viktor\\Documents\\output_mappingX.xml");
+			String savePath = saveField.getText();
+			if(checkSavePath(savePath)) {
+				mapping.writeToXML(savePath);
+				JOptionPane.showMessageDialog(
+						null,
+						Translations.t("gui_l_mapping_created"),
+						Translations.t("gui_save_successful"),
+						JOptionPane.INFORMATION_MESSAGE);
+			}			
 		} catch (MappingWriterException ex) {
 			ex.printStackTrace();
 		}
@@ -155,6 +170,40 @@ public class SaveMappingListener implements ActionListener {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Checks if the given save path is valid or not. Specified paths with already existing files will be also refused!
+	 * @param savePath The path where the file is desired to save.
+	 * @return The entered path is valid or not.
+	 */
+	private boolean checkSavePath(String savePath){
+		boolean isValid = false;
+		
+		File file = new File(savePath);
+		File parentDir = file.getParentFile();
+		
+		if(!file.exists()) {
+			if(parentDir.exists() && parentDir.isDirectory()) {
+				isValid = true;
+			}
+			else {
+				JOptionPane.showMessageDialog(
+						null,
+						Translations.t("gui_err_invalid_save_path"),
+						Translations.t("gui_err_title"),
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		else {
+			JOptionPane.showMessageDialog(
+					null,
+					Translations.t("gui_err_file_exist"),
+					Translations.t("gui_err_title"),
+					JOptionPane.ERROR_MESSAGE);
+		}
+		
+		return isValid;
 	}
 
 }

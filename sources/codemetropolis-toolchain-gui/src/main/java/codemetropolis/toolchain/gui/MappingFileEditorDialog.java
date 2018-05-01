@@ -179,9 +179,9 @@ public class MappingFileEditorDialog extends JDialog {
 	private JPanel createBasePanel() {
 		JPanel panel = new JPanel();
 	    panel.setLayout(null);
-	    panel.setBounds(0, 0, 800, 550);
+	    panel.setBounds(0, 0, 800, 500);
 
-	    Dimension size = new Dimension(800, 550);
+	    Dimension size = new Dimension(800, 500);
 	    panel.setMinimumSize(size);
 	    panel.setPreferredSize(size);
 	    panel.setMaximumSize(size);
@@ -226,12 +226,11 @@ public class MappingFileEditorDialog extends JDialog {
 		CMLabel saveSettingsLabel = new CMLabel(Translations.t("gui_l_save_settings"), 415, 0, 120, 30);
 		CMLabel pathLabel = new CMLabel(Translations.t("gui_l_path"), 415, 35, 60, 30);
 		pathField = new CMTextField(475, 35, 270, 30);
-		pathField.setEditable(false);
 		CMButton specifyPathButton = new CMButton(Translations.t("gui_b_specify_path"), 415, 80, 120, 30);
 		CMButton saveMappingFileButton = new CMButton(Translations.t("gui_b_save_mapping_file"), 415, 120, 165, 30);
 		specifyPathButton.addActionListener(new BrowseListener(pathField, Translations.t("gui_save_filechooser_title"), JFileChooser.FILES_ONLY, XML_FILTER));
 		List<CMTable> tables = Arrays.asList(cellarTable, floorTable, gardenTable);
-		saveMappingFileButton.addActionListener(new SaveMappingListener(pathField.getText(), tables, resourcesList));
+		saveMappingFileButton.addActionListener(new SaveMappingListener(pathField, tables, resourcesList));
 		
 		panel.add(saveSettingsLabel);
 		panel.add(pathLabel);
